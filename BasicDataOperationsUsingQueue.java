@@ -1,49 +1,49 @@
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.Queue;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.PriorityQueue;
+import java.util.ArrayDeque;
 
 /**
- * Клас BasicDataOperationsUsingQueue реалізує роботу з колекціями типу Queue для LocalDateTime.
+ * Клас BasicDataOperationsUsingQueue реалізує роботу з колекціями типу Queue для Instant.
  *
  * <p>Основні функції класу:</p>
  * <ul>
  *   <li>{@link #runDataProcessing()} - Запускає комплекс операцій з даними.</li>
- *   <li>{@link #findInQueue()} - Пошук значення в черзі LocalDateTime.</li>
+ *   <li>{@link #findInQueue()} - Пошук значення в черзі Instant.</li>
  *   <li>{@link #locateMinMaxInQueue()} - Знаходить граничні значення в черзі.</li>
  *   <li>{@link #performQueueOperations()} - Виконує операції peek і poll з чергою.</li>
  * </ul>
  *
  */
 public class BasicDataOperationsUsingQueue {
-    private LocalDateTime dateTimeValueToSearch;
-    private Queue<LocalDateTime> dateTimeQueue;
+    private Instant valueToSearch;
+    private Queue<Instant> valueQueue;
 
     /**
      * Конструктор, який iнiцiалiзує об'єкт з готовими даними.
      *
-     * @param dateTimeValueToSearch Значення для пошуку
-     * @param dateTimeArray Масив LocalDateTime
+     * @param valueToSearch Значення для пошуку
+     * @param valueArray Масив Instant
      */
-    BasicDataOperationsUsingQueue(LocalDateTime dateTimeValueToSearch, LocalDateTime[] dateTimeArray) {
-        this.dateTimeValueToSearch = dateTimeValueToSearch;
-        this.dateTimeQueue = new PriorityQueue<>(Arrays.asList(dateTimeArray));
+    BasicDataOperationsUsingQueue(Instant valueToSearch, Instant[] valueArray) {
+        this.valueToSearch = valueToSearch;
+        this.valueQueue = new ArrayDeque<>(Arrays.asList(valueArray));
     }
 
     /**
      * Запускає комплексну обробку даних з використанням черги.
      *
-     * Метод виконує пошук і визначення граничних значень у черзі LocalDateTime,
+     * Метод виконує пошук і визначення граничних значень у черзі Instant,
      * а потім операції peek і poll.
      */
     public void runDataProcessing() {
         findInQueue();
         locateMinMaxInQueue();
 
-        // зберігаємо до файлу відсортовані значення з PriorityQueue (з повторами);
+        // зберігаємо до файлу відсортовані значення з ArrayDeque (з повторами);
         // порядок обходу черги не є відсортованим, тому сортуємо копію її вмісту
-        LocalDateTime[] sortedQueueValues = dateTimeQueue.toArray(new LocalDateTime[0]);
+        Instant[] sortedQueueValues = valueQueue.toArray(new Instant[0]);
         Arrays.sort(sortedQueueValues);
         DataFileHandler.writeArrayToFile(sortedQueueValues, BasicDataOperations.SORTED_FILE_PREFIX + ".queue.data");
 
@@ -56,30 +56,30 @@ public class BasicDataOperationsUsingQueue {
      */
     private void findInQueue() {
         // натозву операції будуємо до заміру, щоб склеювання рядка не потрапило у вимір
-        String operationName = "пошук елемента '" + dateTimeValueToSearch + "' в PriorityQueue<LocalDateTime>";
+        String operationName = "пошук елемента '" + valueToSearch + "' в ArrayDeque<Instant>";
         // вимірюємо час пошуку в черзі
         long timeStart = System.nanoTime();
 
-        // PriorityQueue зберігає елементи як бінарну купу в масиві: кожен батьківський елемент
+        // ArrayDeque зберігає елементи як бінарну купу в масиві: кожен батьківський елемент
         // не більший за своїх нащадків, але між «сусідніми» гілками порядку немає.
         // Тому бінарний пошук неможливий, і contains() перебирає внутрішній масив від початку
         // й порівнює кожен елемент через equals(), доки не знайде збіг. Це лінійний пошук, O(n).
-        boolean elementExists = this.dateTimeQueue.contains(dateTimeValueToSearch);
+        boolean elementExists = this.valueQueue.contains(valueToSearch);
 
         PerformanceTracker.displayOperationTime(timeStart, operationName);
 
         if (elementExists) {
-            System.out.println("Елемент '" + dateTimeValueToSearch + "' знайдено в Queue");
+            System.out.println("Елемент '" + valueToSearch + "' знайдено в Queue");
         } else {
-            System.out.println("Елемент '" + dateTimeValueToSearch + "' відсутній в Queue.");
+            System.out.println("Елемент '" + valueToSearch + "' відсутній в Queue.");
         }
     }
 
     /**
-     * Визначає найменше та найбільше значення в черзі LocalDateTime.
+     * Визначає найменше та найбільше значення в черзі Instant.
      */
     private void locateMinMaxInQueue() {
-        if (dateTimeQueue == null || dateTimeQueue.isEmpty()) {
+        if (valueQueue == null || valueQueue.isEmpty()) {
             System.out.println("Черга є пустою або не ініціалізованою.");
             return;
         }
@@ -92,34 +92,34 @@ public class BasicDataOperationsUsingQueue {
         // Найменший елемент купи завжди лежить у її корені, тож його можна було б отримати
         // через peek() за O(1). Найбільший може бути в будь-якому листку купи, тому
         // для максимуму без повного перегляду не обійтися.
-        LocalDateTime minValue = Collections.min(dateTimeQueue);
-        LocalDateTime maxValue = Collections.max(dateTimeQueue);
+        Instant minValue = Collections.min(valueQueue);
+        Instant maxValue = Collections.max(valueQueue);
 
-        PerformanceTracker.displayOperationTime(timeStart, "визначення мiнiмальної i максимальної дати в PriorityQueue<LocalDateTime>");
+        PerformanceTracker.displayOperationTime(timeStart, "визначення мiнiмальної i максимальної дати в ArrayDeque<Instant>");
 
         System.out.println("Найменше значення в Queue: " + minValue);
         System.out.println("Найбільше значення в Queue: " + maxValue);
     }
 
     /**
-     * Виконує операції peek і poll з чергою LocalDateTime.
+     * Виконує операції peek і poll з чергою Instant.
      */
     private void performQueueOperations() {
-        if (dateTimeQueue == null || dateTimeQueue.isEmpty()) {
+        if (valueQueue == null || valueQueue.isEmpty()) {
             System.out.println("Черга є пустою або не ініціалізованою.");
             return;
         }
 
         // peek() повертає корінь купи, тобто найменшу дату, не видаляючи її; O(1).
-        LocalDateTime headElement = dateTimeQueue.peek();
+        Instant headElement = valueQueue.peek();
         System.out.println("Головний елемент черги (peek): " + headElement);
 
         // poll() видаляє корінь: на його місце стає останній елемент купи і «просідає» вниз,
         // доки не відновиться порядок купи; O(log n). Новим коренем стає наступна найменша дата.
-        headElement = dateTimeQueue.poll();
+        headElement = valueQueue.poll();
         System.out.println("Видалений елемент черги (poll): " + headElement);
 
-        headElement = dateTimeQueue.peek();
+        headElement = valueQueue.peek();
         System.out.println("Новий головний елемент черги: " + headElement);
     }
 }
