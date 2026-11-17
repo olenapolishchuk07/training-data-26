@@ -75,12 +75,12 @@ public class BasicDataOperationsUsingMap {
         /**
          * Порівнює цю папороть з іншим для визначення природного порядку сортування.
          *
-         * <p>Критерій порівняння: рід (genus) за зростанням, а для однакових рідів - довжина листка (frondLength) за спаданням.</p>
+         * <p>Критерій порівняння: рід (genus) за спаданням, а для однакових рідів - довжина листка (frondLength) за зростанням.</p>
          *
          * <p>Метод використовується:</p>
          * <ul>
-         *   <li>LinkedHashMap - для автоматичного впорядкування ключів;</li>
-         *   <li>Collections.sort() - для сортування списку ключів.</li>
+         *   <li>Collections.sort() - для сортування списку ключів у HashMap та LinkedHashMap;</li>
+         *   <li>Collections.min() та Collections.max() - для визначення найменшого й найбільшого ключа.</li>
          * </ul>
          *
          * <p>Метод узгоджений з equals(): compareTo() повертає 0 тоді й лише тоді,
@@ -380,7 +380,7 @@ public class BasicDataOperationsUsingMap {
 
     /**
      * Здійснює пошук елемента за ключем в LinkedHashMap.
-     * Використовує Fern.compareTo() для навігації по червоно-чорному дереву.
+     * Використовує Fern.hashCode() та Fern.equals() для пошуку елемента в хеш-таблиці.
      */
     void findByKeyInLinkedHashMap() {
         long timeStart = System.nanoTime();
@@ -423,8 +423,8 @@ public class BasicDataOperationsUsingMap {
 
     /**
      * Визначає найменший і найбільший ключі в LinkedHashMap.
-     * LinkedHashMap реалізує SequencedMap (Java 21) і впорядкована за Fern.compareTo(),
-     * тому перший і останній записи - це найменший і найбільший ключі; перебір не потрібен.
+     * До сортування потрібен перебір усіх ключів через Collections.min()/max() - O(n),
+     * а після сортування перший і останній записи повертаються напряму через firstEntry()/lastEntry() (SequencedMap).
      */
     void findMinMaxKeyInLinkedHashMap() {
         if (linkedHashMap.isEmpty()) {
